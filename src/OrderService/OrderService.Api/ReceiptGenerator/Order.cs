@@ -7,7 +7,7 @@ using OrderService.Data.Models;
 
 namespace OrderService.Api.ReceiptGenerator
 {
-	public class Order:IOrder
+	public class Order: IReceiptGenerator
 	{
 		private readonly IList<OrderLine> _orderLines = new List<OrderLine>();
         private string Company { get; }

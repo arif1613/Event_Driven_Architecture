@@ -25,29 +25,6 @@ namespace OrderService.Api.Controllers
         }
 
         [HttpPost]
-        [Route("bulkinsertproducts")]
-        public async Task<IActionResult> BulkInsertProducts([FromBody] int totalrecord)
-        {
-            var products = Enumerable.Range(0, totalrecord).Select(r => new Product
-            {
-                Id = Guid.NewGuid(),
-                ProductName = $"test product name {r}",
-                ProductType = $"test product type {r}",
-                Price = r * 10
-            });
-            try
-            {
-                await _productService.AddProducts(products.ToList());
-            }
-            catch (Exception e)
-            {
-                return Problem(e.Message);
-            }
-
-            return Ok($"{totalrecord} products added");
-        }
-
-        [HttpPost]
         [Route("bulkinsertorderlines")]
         public async Task<IActionResult> BulkInsertOrderLines([FromBody] int totalrecord)
         {

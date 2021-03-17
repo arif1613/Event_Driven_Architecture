@@ -12,7 +12,7 @@ namespace OrderService.Api.Services
         Task AddOrderLines(List<OrderLine> OrderLines);
 
         Task<OrderLine> GetOrderLineById(int id);
-        Task<List<OrderLine>> GetOrderLines();
+        Task<List<OrderLine>> GetOrderLines(string inculedproperties);
 
     }
 }

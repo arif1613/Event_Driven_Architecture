@@ -33,9 +33,9 @@ namespace OrderService.Api.Services
 
         }
 
-        public async Task<List<OrderLine>> GetOrderLines()
+        public async Task<List<OrderLine>> GetOrderLines(string inculedproperties)
         {
-            return await Task.Run(() => _unitOfWork.OrderLineRepository.Get().ToList());
+            return await Task.Run(() => _unitOfWork.OrderLineRepository.Get(inculedproperties).ToList());
 
         }
     }

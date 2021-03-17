@@ -16,11 +16,11 @@ namespace OrderService.Data.Repo
         {
             this.context = context;
         }
-        public IEnumerable<TEntity> Get(string includeProperties=null)
+        public IEnumerable<TEntity> Get(string includeProperties = null)
         {
             IQueryable<TEntity> query = context.GetDbSet<TEntity>();
 
-            if (includeProperties!=null)
+            if (includeProperties != null)
             {
                 foreach (var includeProperty in includeProperties.Split
                     (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -40,24 +40,29 @@ namespace OrderService.Data.Repo
 
         public virtual void Insert(TEntity entity)
         {
-            context.GetDbSet<TEntity>().Add(entity);
+            try
+            {
+                context.GetDbSet<TEntity>().Add(entity);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw e;
+            }
             context.SaveDatabase();
         }
 
         public void Insert(List<TEntity> entities)
         {
-            foreach (var entity in entities)
-            {
-                try
-                {
-                    context.GetDbSet<TEntity>().Add(entity);
 
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    throw;
-                }
+            try
+            {
+                context.GetDbSet<TEntity>().AddRange(entities);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                throw e;
             }
             context.SaveDatabase();
         }

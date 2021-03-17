@@ -9,10 +9,6 @@ namespace OrderService.Data.Test.TestHelpers
     {
         public static Mock<T> MockContext<T>() where T : class
         {
-            //var repo=new Mock<DbContext>();
-            //repo.Setup(d => d.SaveChanges()).Returns(1);
-            //repo.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => queryableEntity.ToList().Add(s));
-
             return new Mock<T>();
         }
 
