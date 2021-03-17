@@ -5,9 +5,12 @@ namespace OrderService.Data.Context
 {
     public interface IOrderContext
     {
-        public DbSet<Pin> Pins { get; set; }
-        public int SaveDatabase();
-        public void UpdateEntry(Pin pin);
+        public DbSet<OrderLine> OrderLines { get; set; }
+        public DbSet<Product> Products { get; set; }
 
+        void UpdateEntry<TEntity>(TEntity entity) where TEntity : class;
+        void DeleteEntry<TEntity>(TEntity entity) where TEntity : class;
+        void SaveDatabase();
+        DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class;
     }
 }

@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using OrderService.Data.Models;
+
+namespace OrderService.Api.Services
+{
+    public interface IProductService
+    {
+        Task AddProduct(Product product);
+        Task AddProducts(List<Product> products);
+
+        Task<Product> GetProductById(int id);
+        Task<List<Product>> GetProducts();
+
+    }
+}

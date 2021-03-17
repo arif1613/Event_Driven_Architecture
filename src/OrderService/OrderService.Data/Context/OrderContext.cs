@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.VisualBasic.FileIO;
 using OrderService.Data.Models;
 
@@ -9,23 +10,35 @@ namespace OrderService.Data.Context
 {
     public sealed class OrderContext: DbContext,IOrderContext
     {
-        public DbSet<Pin> Pins { get; set; }
-        public int SaveDatabase()
-        {
-            return SaveChanges();
-        }
-
-        public void UpdateEntry(Pin pin)
-        {
-            Entry(pin).State = EntityState.Modified;
-            SaveChanges();
-        }
 
         public OrderContext()
         {
             //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
+        public DbSet<OrderLine> OrderLines { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public void SaveDatabase()
+        {
+            SaveChanges();
+        }
+
+        public DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class
+        {
+            return Set<TEntity>();
+        }
+
+        public void UpdateEntry<TEntity>(TEntity entity) where TEntity : class
+        {
+            Entry(entity).State = EntityState.Modified;
+        }
+
+        public void DeleteEntry<TEntity>(TEntity entity) where TEntity : class
+        {
+            Entry(entity).State = EntityState.Deleted;
+        }
+
+        
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -41,5 +54,7 @@ namespace OrderService.Data.Context
                 throw e;
             }
         }
+
+      
     }
 }

@@ -1,16 +1,10 @@
 ﻿namespace OrderService.Data.Models
 {
-	public class Product
+	public class Product: BaseDbModel
 	{
-        public string ProductType { get; }
-        public string ProductName { get; }
-        public int Price { get; }
-		public Product(string productType, string productName, int price)
-		{
-			ProductType = productType;
-			ProductName = productName;
-			Price = price;
-		}
+        public string ProductType { get; set; }
+        public string ProductName { get; set; }
+        public int Price { get; set; }
 		
 	}
 }

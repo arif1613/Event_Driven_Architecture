@@ -9,7 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using OrderService.Api.Services;
+using OrderService.Api.UnitOfWork;
+using OrderService.Data.Context;
+using OrderService.Data.Repo;
 
 namespace OrderService.Api
 {
@@ -34,6 +39,20 @@ namespace OrderService.Api
                         .AllowAnyMethod()
                         .AllowAnyHeader());
             });
+
+
+            //Register context
+            //services.AddEntityFrameworkSqlite().AddDbContext<OrderContext>();
+            services.AddScoped<IOrderContext, OrderContext>();
+
+            //register repos
+            services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
+            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+
+            //register services
+            services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IOrderLineService, OrderLineService>();
+
             AddSwagger(services);
             services.AddControllers();
         }

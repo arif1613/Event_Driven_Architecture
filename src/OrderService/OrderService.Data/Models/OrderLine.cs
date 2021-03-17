@@ -1,13 +1,8 @@
 ﻿namespace OrderService.Data.Models
 {
-	public class OrderLine
+	public class OrderLine: BaseDbModel
 	{
-        public Product Product { get; }
-        public int Quantity { get; }
-		public OrderLine(Product product, int quantity)
-		{
-			Product = product;
-			Quantity = quantity;
-		}
+        public virtual Product Product { get; set; }
+		public int Quantity { get; set; }
 	}
 }
