@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Moq;
+using OrderService.Data.Context;
 
 namespace OrderService.Data.Test.TestHelpers
 {
@@ -21,12 +24,7 @@ namespace OrderService.Data.Test.TestHelpers
             dbset.As<IQueryable<T>>().Setup(p => p.GetEnumerator()).Returns(queryableEntity.GetEnumerator());
             dbset.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => queryableEntity.ToList().Add(s));
             dbset.Setup(d => d.AddRange(It.IsAny<List<T>>())).Callback<IEnumerable<T>>((s) => queryableEntity.ToList().AddRange(s));
-
             return dbset;
-        }
-        public static Mock<T> MockRepository<T>() where T : class
-        {
-            return new Mock<T>();
         }
     }
 }

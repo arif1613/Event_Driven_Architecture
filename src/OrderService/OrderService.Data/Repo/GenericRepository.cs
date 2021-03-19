@@ -19,7 +19,7 @@ namespace OrderService.Data.Repo
 
         public List<TEntity> Get(Expression<Func<TEntity, bool>> filter=null, string includeProperties = null)
         {
-            IQueryable<TEntity> query = context.GetDbSet<TEntity>().AsQueryable();
+            IQueryable<TEntity> query = context.GetDbSet<TEntity>();
             if (filter!=null)
             {
                 query = query.Where(filter);
