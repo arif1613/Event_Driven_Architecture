@@ -16,8 +16,13 @@ namespace OrderService.Data.Context
             //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
+
+        public DbSet<Order> Orders { get; set; }
+
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Receipt> Receipts { get; set; }
+
         public void SaveDatabase()
         {
             SaveChanges();

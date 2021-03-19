@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using OrderService.Data.Models;
 
@@ -11,8 +11,8 @@ namespace OrderService.Api.Services
         Task AddProduct(Product product);
         Task AddProducts(List<Product> products);
 
-        Task<Product> GetProductById(int id);
-        Task<List<Product>> GetProducts();
+        Task<Product> GetProduct(Expression<Func<Product, bool>> filter, string includeProperties);
+        Task<List<Product>> GetProducts(Expression<Func<Product, bool>> filter, string includeProperties);
 
     }
 }

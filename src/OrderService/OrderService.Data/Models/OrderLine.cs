@@ -1,8 +1,12 @@
-﻿namespace OrderService.Data.Models
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+
+namespace OrderService.Data.Models
 {
-	public class OrderLine: BaseDbModel
-	{
+    public class OrderLine : BaseDbModel
+    {
         public virtual Product Product { get; set; }
-		public int Quantity { get; set; }
-	}
+        [Required]
+        public int Quantity { get; set; }
+    }
 }

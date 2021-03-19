@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
-using OrderService.Api.UnitOfWork;
 using OrderService.Data.Models;
+using OrderService.Data.UnitOfWork;
 
 namespace OrderService.Api.Services
 {
@@ -27,15 +28,19 @@ namespace OrderService.Api.Services
 
         }
 
-        public async Task<Product> GetProductById(int id)
+        public async Task<Product> GetProduct(Expression<Func<Product, bool>> filter, string includeProperties)
         {
-            return await Task.Run(() => _unitOfWork.ProductRepository.Get(id));
-
+            var products= await Task.Run(() => _unitOfWork.ProductRepository.Get(filter, includeProperties));
+            if (!products.Any())
+            {
+                return null;
+            }
+            return products.FirstOrDefault();
         }
 
-        public async Task<List<Product>> GetProducts()
+        public async Task<List<Product>> GetProducts(Expression<Func<Product, bool>> filter, string includeProperties)
         {
-            return await Task.Run(() => _unitOfWork.ProductRepository.Get().ToList());
+            return await Task.Run(() => _unitOfWork.ProductRepository.Get(filter,includeProperties));
 
         }
     }

@@ -1,20 +1,19 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using MediatR;
 using Microsoft.OpenApi.Models;
+using OrderService.Api.Model;
 using OrderService.Api.Services;
-using OrderService.Api.UnitOfWork;
+using OrderService.Api.Utils.EmailSender;
+using OrderService.Api.Utils.OrderActions;
+using OrderService.Api.Utils.ReceiptGenerator;
 using OrderService.Data.Context;
 using OrderService.Data.Repo;
+using OrderService.Data.UnitOfWork;
 
 namespace OrderService.Api
 {
@@ -42,19 +41,39 @@ namespace OrderService.Api
 
 
             //Register context
-            //services.AddEntityFrameworkSqlite().AddDbContext<OrderContext>();
-            services.AddScoped<IOrderContext, OrderContext>();
+            services.AddTransient<IOrderContext, OrderContext>();
 
             //register repos
             services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             //register services
             services.AddScoped<IProductService, ProductService>();
-            services.AddScoped<IOrderLineService, OrderLineService>();
+            services.AddScoped<IOrderService, Services.OrderService>();
+            services.AddScoped<IReceiptService, ReceiptService>();
+            services.AddScoped<IEmailSender, EmailSender>();
+            services.AddScoped<IReceiptGenerator, ReceiptGenerator>();
+            services.AddScoped<IOrderAction,OrderAction>();
+
+
+            //MediatR
+            BuildMediator(services);
 
             AddSwagger(services);
             services.AddControllers();
+        }
+
+        private static IMediator BuildMediator(IServiceCollection services)
+        {
+            //Request
+            services.AddMediatR(typeof(CreateOrderRequest));
+            services.AddMediatR(typeof(SendEmailRequest));
+
+            //Notification
+            services.AddMediatR(typeof(GenerateReceiptNotification));
+            var provider = services.BuildServiceProvider();
+            return provider.GetRequiredService<IMediator>();
+
         }
 
 
@@ -68,30 +87,6 @@ namespace OrderService.Api
                     Version = "V1",
                     Description = $"Order api endpoints"
 
-                });
-
-                c.AddSecurityDefinition("OrderBearer", //Name the security scheme
-                    new OpenApiSecurityScheme
-                    {
-                        Description = "JWT Authorization header using the Bearer scheme.",
-                        Type = SecuritySchemeType.Http, //We set the scheme type to http since we're using bearer authentication
-                        Scheme = "bearer",
-                        //The name of the HTTP Authorization scheme to be used in the Authorization header. In this case "bearer".
-                    });
-
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Id = "OrderBearer", //The name of the previously defined security scheme.
-                                Type = ReferenceType.SecurityScheme
-                            }
-                        },
-                        new List<string>()
-                    }
                 });
 
             });

@@ -1,54 +1,81 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using OrderService.Api.Model;
 using OrderService.Api.Services;
-using OrderService.Api.UnitOfWork;
 using OrderService.Data.Models;
 
 namespace OrderService.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    //[Authorize]
     public class AdminController : ControllerBase
     {
         private readonly IProductService _productService;
-        private readonly IOrderLineService _orderlineService;
+        private readonly IReceiptService _receiptService;
+        private readonly IOrderService _orderService;
 
 
-        public AdminController(IProductService productService, IOrderLineService orderlineService)
+
+        public AdminController(IProductService productService, IReceiptService receiptService, IOrderService orderService)
         {
             _productService = productService;
-            _orderlineService = orderlineService;
+            _receiptService = receiptService;
+            _orderService = orderService;
+        }
+
+        [HttpGet]
+        [Route("getproducts")]
+        public async Task<IActionResult> GetProducts()
+        {
+            return Ok(await _productService.GetProducts(null, null));
+        }
+
+        [HttpGet]
+        [Route("getorders")]
+        public async Task<IActionResult> GetOrderLines()
+        {
+            return Ok(await _orderService.GetOrders(null, "OrderLines"));
+        }
+
+        [HttpGet]
+        [Route("getjsonreceipts")]
+        public async Task<IActionResult> GetJsonReceipts()
+        {
+            return Ok(await _receiptService.GetReceipts(r=>r.ReceiptType==ReceiptType.JSon, null));
+        }
+
+        [HttpGet]
+        [Route("gethtmlreceipts")]
+        public async Task<IActionResult> GetHtmlReceipts()
+        {
+            return Ok(await _receiptService.GetReceipts(r => r.ReceiptType == ReceiptType.Html, null));
         }
 
         [HttpPost]
-        [Route("bulkinsertorderlines")]
-        public async Task<IActionResult> BulkInsertOrderLines([FromBody] int totalrecord)
+        [Route("addproduct")]
+        public async Task<IActionResult> AddProduct([FromBody] AddProduct model)
         {
-            var orderLines = Enumerable.Range(0, totalrecord).Select(r => new OrderLine
+            if (!ModelState.IsValid)
             {
-                Id = Guid.NewGuid(),
-                Product = new Product
-                {
-                    Id = Guid.NewGuid(),
-                    ProductName = $"test product name {r}",
-                    ProductType = $"test product type {r}",
-                    Price = r * 10
-                }
-            });
-            try
-            {
-                await _orderlineService.AddOrderLines(orderLines.ToList());
-            }
-            catch (Exception e)
-            {
-                return Problem(e.Message);
+                return BadRequest("Please enter valid input");
             }
 
-            return Ok($"{totalrecord} products added");
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                ProductName = model.ProductName,
+                ProductType = model.ProductType,
+                Price = model.Price,
+                HasDisabilityDiscount = model.HasDisabilityDiscount,
+                HasFlatDiscount = model.HasFlatDiscount,
+                HasQuantityDiscount = model.HasQuantityDiscount
+            };
+            await _productService.AddProduct(product);
+            return Ok(product);
         }
+
     }
 }

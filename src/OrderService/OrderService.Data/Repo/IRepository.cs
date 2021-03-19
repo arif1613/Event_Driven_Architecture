@@ -8,8 +8,7 @@ namespace OrderService.Data.Repo
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        IEnumerable<TEntity> Get(string includeProperties=null);
-        TEntity Get(object id);
+        List<TEntity> Get(Expression<Func<TEntity, bool>> filter, string includeProperties);
         void Insert(TEntity entity);
         void Insert(List<TEntity> entities);
 

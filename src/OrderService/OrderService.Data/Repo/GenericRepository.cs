@@ -16,26 +16,21 @@ namespace OrderService.Data.Repo
         {
             this.context = context;
         }
-        public IEnumerable<TEntity> Get(string includeProperties = null)
-        {
-            IQueryable<TEntity> query = context.GetDbSet<TEntity>();
 
-            if (includeProperties != null)
+        public List<TEntity> Get(Expression<Func<TEntity, bool>> filter=null, string includeProperties = null)
+        {
+            IQueryable<TEntity> query = context.GetDbSet<TEntity>().AsQueryable();
+            if (filter!=null)
             {
-                foreach (var includeProperty in includeProperties.Split
-                    (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(includeProperty);
-                }
-
+                query = query.Where(filter);
             }
-
+            if (includeProperties == null) return query.ToList();
+            foreach (var includeProperty in includeProperties.Split
+                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
             return query.ToList();
-        }
-
-        public TEntity Get(object id)
-        {
-            return context.GetDbSet<TEntity>().Find(id);
         }
 
         public virtual void Insert(TEntity entity)
