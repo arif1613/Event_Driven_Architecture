@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -59,6 +60,18 @@ namespace OrderService.Data.Test.RepoTests
             Assert.AreEqual(1, products.Count);
             Assert.AreEqual(products[0].ProductName, "product name 20");
         }
+
+
+        [TestMethod]
+        public void Add_Will_Return_Correct__Product()
+        {
+            var productRepo = new GenericRepository<Product>(orderContextMock.Object);
+            var products = productRepo.Get(r => r.ProductName == "product name 20", null);
+            Assert.IsNotNull(products);
+            Assert.AreEqual(1, products.Count);
+            Assert.AreEqual(products[0].ProductName, "product name 20");
+        }
+
 
         [TestCleanup]
         public void Cleanup()
