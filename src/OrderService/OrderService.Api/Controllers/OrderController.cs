@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -31,15 +32,33 @@ namespace OrderService.Api.Controllers
                 return BadRequest("Please insert valid data");
             }
 
-            var order = await _mediator.Send(model,default(CancellationToken));
+            var order = await _mediator.Send(model);
             if (order==null)
             {
                 return NotFound("Product not found");
             }
-            await _mediator.Publish(new GenerateReceiptNotification
+
+
+            //Notify json generator service
+            await _mediator.Publish(new GenerateJsonReceiptNotification
             {
+                MessageId = Guid.NewGuid(),
                 Order = order
-            }, default(CancellationToken));
+            });
+
+            //Notify html generator service
+            await _mediator.Publish(new GenerateHtmlReceiptNotification
+            {
+                MessageId = Guid.NewGuid(),
+                Order = order
+            });
+
+            //Notify email sender service
+            await _mediator.Publish(new SendemailNotification
+            {
+                MessageId = Guid.NewGuid(),
+                Order = order
+            });
 
             return Ok(order);
         }

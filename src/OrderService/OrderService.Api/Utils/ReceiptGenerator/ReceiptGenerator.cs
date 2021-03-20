@@ -9,7 +9,7 @@ namespace OrderService.Api.Utils.ReceiptGenerator
     public class ReceiptGenerator : IReceiptGenerator
     {
 
-        public string GenerateReceipt(Order order)
+        public string GenerateJsonReceipt(Order order)
         {
             double totalAmount = 0d;
             StringBuilder result = new StringBuilder($"Order receipt for '{order.Company}'{Environment.NewLine}");

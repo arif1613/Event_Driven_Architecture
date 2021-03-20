@@ -10,7 +10,7 @@ using OrderService.Data.Models;
 
 namespace OrderService.Api.RequestHandlers
 {
-    public class GenerateReceiptNotificationHandlerHtml : INotificationHandler<GenerateReceiptNotification>
+    public class GenerateReceiptNotificationHandlerHtml : INotificationHandler<GenerateHtmlReceiptNotification>
     {
         private readonly IReceiptGenerator _receiptGenerator;
         private readonly IReceiptService _receiptService;
@@ -21,11 +21,9 @@ namespace OrderService.Api.RequestHandlers
             _receiptGenerator = receiptGenerator;
             _receiptService = receiptService;
         }
-        public async Task Handle(GenerateReceiptNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(GenerateHtmlReceiptNotification notification, CancellationToken cancellationToken)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            var htmlresult = await Task.Run(() => _receiptGenerator.GenerateHtmlReceipt(notification.Order));
+            var htmlresult = await Task.Run(() => _receiptGenerator.GenerateHtmlReceipt(notification.Order), default(CancellationToken));
             if (htmlresult == null)
             {
                 Console.WriteLine("No html receipt generated");
@@ -42,8 +40,6 @@ namespace OrderService.Api.RequestHandlers
                     ReceiptType = ReceiptType.Html
                 });
             }
-            sw.Stop();
-            sw.Reset();
         }
     }
 }

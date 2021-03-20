@@ -11,28 +11,19 @@ using OrderService.Data.Models;
 
 namespace OrderService.Api.RequestHandlers
 {
-    public class GenerateReceiptNotificationHandlerEmail : INotificationHandler<GenerateReceiptNotification>
+    public class GenerateReceiptNotificationHandlerEmail : INotificationHandler<SendemailNotification>
     {
         private readonly IReceiptGenerator _receiptGenerator;
         private readonly IReceiptService _receiptService;
-        private readonly IEmailSender _emailSender;
-        private readonly IMediator _mediator;
 
-
-
-
-        public GenerateReceiptNotificationHandlerEmail(IReceiptGenerator receiptGenerator, IReceiptService receiptService, IEmailSender emailSender, IMediator mediator)
+        public GenerateReceiptNotificationHandlerEmail(IReceiptGenerator receiptGenerator, IReceiptService receiptService)
         {
             _receiptGenerator = receiptGenerator;
             _receiptService = receiptService;
-            _emailSender = emailSender;
-            _mediator = mediator;
         }
-
-
-        public async Task Handle(GenerateReceiptNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(SendemailNotification notification, CancellationToken cancellationToken)
         {
-            var emailbody = await Task.Run(() => _receiptGenerator.GenerateEmailReceipt(notification.Order));
+            var emailbody = await Task.Run(() => _receiptGenerator.GenerateEmailReceipt(notification.Order),default(CancellationToken));
 
             if (emailbody == null)
             {
@@ -40,14 +31,6 @@ namespace OrderService.Api.RequestHandlers
             }
             else
             {
-                var result = await _mediator.Send(new SendEmailRequest
-                {
-                    EmailBody = emailbody
-                });
-
-                if (result == EmailSendResult.Sent)
-                {
-
                     await _receiptService.AddReceipt(new Receipt
                     {
                         Id = Guid.NewGuid(),
@@ -57,9 +40,10 @@ namespace OrderService.Api.RequestHandlers
                         ReceiptGenerationTime = DateTime.UtcNow,
                         ReceiptType = ReceiptType.email
                     });
-                }
             }
         }
+
+       
     }
 
 

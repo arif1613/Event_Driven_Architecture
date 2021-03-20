@@ -67,10 +67,11 @@ namespace OrderService.Api
         {
             //Request
             services.AddMediatR(typeof(CreateOrderRequest));
-            services.AddMediatR(typeof(SendEmailRequest));
-
             //Notification
-            services.AddMediatR(typeof(GenerateReceiptNotification));
+            services.AddMediatR(typeof(GenerateJsonReceiptNotification));
+            services.AddMediatR(typeof(GenerateHtmlReceiptNotification));
+            services.AddMediatR(typeof(SendemailNotification));
+            
             var provider = services.BuildServiceProvider();
             return provider.GetRequiredService<IMediator>();
 

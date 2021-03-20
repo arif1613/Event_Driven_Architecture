@@ -10,7 +10,7 @@ using OrderService.Data.Models;
 
 namespace OrderService.Api.RequestHandlers
 {
-    public class GenerateReceiptNotificationHandlerJson : INotificationHandler<GenerateReceiptNotification>
+    public class GenerateReceiptNotificationHandlerJson : INotificationHandler<GenerateJsonReceiptNotification>
     {
         private readonly IReceiptGenerator _receiptGenerator;
         private readonly IReceiptService _receiptService;
@@ -23,11 +23,9 @@ namespace OrderService.Api.RequestHandlers
         }
 
 
-        public async Task Handle(GenerateReceiptNotification notification, CancellationToken cancellationToken)
+        public async Task Handle(GenerateJsonReceiptNotification notification, CancellationToken cancellationToken)
         {
-            var sw = new Stopwatch();
-            sw.Start();
-            var jsonresult = await Task.Run(() => _receiptGenerator.GenerateReceipt(notification.Order));
+            var jsonresult = await Task.Run(() => _receiptGenerator.GenerateJsonReceipt(notification.Order), default(CancellationToken));
             if (jsonresult == null)
             {
                 Console.WriteLine("No json receipt generated");
@@ -44,8 +42,6 @@ namespace OrderService.Api.RequestHandlers
                     ReceiptType = ReceiptType.JSon
                 });
             }
-            sw.Stop();
-            sw.Reset();
         }
     }
 }

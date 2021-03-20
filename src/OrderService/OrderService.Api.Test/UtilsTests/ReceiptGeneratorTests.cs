@@ -56,7 +56,7 @@ namespace OrderService.Api.Test.UtilsTests
         public void Can_generate_json_receipt()
         {
             var receiptGenerator = new ReceiptGenerator();
-            var htmlReceipt = receiptGenerator.GenerateReceipt(_order);
+            var htmlReceipt = receiptGenerator.GenerateJsonReceipt(_order);
             string expected = $"Order receipt for 'Test Company'\r\n\t1 x Car Insurance Basic = 1.000,00 kr\r\nSubtotal: 1.000,00 kr\r\nMVA: 250,00 kr\r\nTotal: 1.250,00 kr";
             Assert.IsNotNull(htmlReceipt);
             Assert.AreEqual(htmlReceipt, expected);
