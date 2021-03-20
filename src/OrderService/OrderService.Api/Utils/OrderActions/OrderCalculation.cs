@@ -9,11 +9,11 @@ using OrderService.Data.Models;
 
 namespace OrderService.Api.Utils.OrderActions
 {
-    public class OrderAction:IOrderAction
+    public class OrderCalculation:IOrderCalculation
     {
         private readonly IConfiguration _configuration;
 
-        public OrderAction(IConfiguration configuration)
+        public OrderCalculation(IConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -27,30 +27,45 @@ namespace OrderService.Api.Utils.OrderActions
                 product.Price = product.Price - discount;
             }
 
+            int totalPrice = 0;
+            for (int i = 0; i < request.Quantity; i++)
+            {
+                totalPrice = totalPrice + product.Price;
+            }
+
+
             if (product.HasFlatDiscount && product.Price >= Convert.ToInt32(_configuration.GetSection("FlatDiscount").Value))
             {
                 var flatDiscount = Convert.ToInt32(_configuration.GetSection("FlatDiscount").Value);
-                product.Price = product.Price - flatDiscount;
+                totalPrice = totalPrice - flatDiscount;
             }
 
             if (product.HasDisabilityDiscount && product.Price >= Convert.ToInt32(_configuration.GetSection("DisabilityDiscount").Value))
             {
                 var disabilityDiscount = Convert.ToInt32(_configuration.GetSection("DisabilityDiscount").Value);
-                product.Price = product.Price - disabilityDiscount;
+                totalPrice = totalPrice - disabilityDiscount;
             }
 
+           
 
             var orderline = new OrderLine
             {
                 Id = Guid.NewGuid(),
                 Product = product,
-                Quantity = request.Quantity
+                Quantity = request.Quantity,
+                TotalPrice = totalPrice
             };
             return orderline;
         }
 
         public Order CreateOrder(CreateOrderRequest request, List<OrderLine> orderlines)
         {
+            int totalPrice = 0;
+            foreach (var orderline in orderlines)
+            {
+                    totalPrice = totalPrice + orderline.TotalPrice;
+            }
+
             var order = new Order
             {
                 Company = request.CompanyName,

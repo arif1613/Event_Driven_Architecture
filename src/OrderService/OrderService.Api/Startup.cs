@@ -53,7 +53,7 @@ namespace OrderService.Api
             services.AddScoped<IReceiptService, ReceiptService>();
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IReceiptGenerator, ReceiptGenerator>();
-            services.AddScoped<IOrderAction,OrderAction>();
+            services.AddScoped<IOrderCalculation,OrderCalculation>();
 
 
             //MediatR

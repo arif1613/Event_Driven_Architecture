@@ -14,8 +14,8 @@ namespace OrderService.Api.RequestHandlers
     {
         private readonly IProductService _productService;
         private readonly IOrderService _orderService;
-        private readonly IOrderAction _orderAction;
-        public CreateOrderRequestHandler(IProductService productService, IOrderService orderService, IOrderAction orderAction)
+        private readonly IOrderCalculation _orderAction;
+        public CreateOrderRequestHandler(IProductService productService, IOrderService orderService, IOrderCalculation orderAction)
         {
             _productService = productService;
             _orderService = orderService;

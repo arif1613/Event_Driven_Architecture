@@ -8,5 +8,7 @@ namespace OrderService.Data.Models
         public virtual Product Product { get; set; }
         [Required]
         public int Quantity { get; set; }
+        public int TotalPrice { get; set; }
+
     }
 }
