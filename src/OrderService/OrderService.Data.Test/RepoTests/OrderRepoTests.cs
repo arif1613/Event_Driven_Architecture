@@ -12,7 +12,7 @@ using OrderService.Data.Repo;
 namespace OrderService.Data.Test.RepoTests
 {
     [TestClass]
-    public class GenericRepoTests
+    public class OrderRepoTests
     {
 
         private Mock<IOrderContext> orderContextMock;
