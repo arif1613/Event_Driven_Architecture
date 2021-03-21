@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OrderService.Data.Models
+﻿namespace OrderService.Data.Models
 {
 	public class Prices
     {

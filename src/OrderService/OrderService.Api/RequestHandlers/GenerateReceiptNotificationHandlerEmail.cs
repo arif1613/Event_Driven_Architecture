@@ -1,44 +1,53 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
-using OrderService.Api.Model;
+using OrderService.Api.Model.Notification;
 using OrderService.Api.Services;
-using OrderService.Api.Utils.EmailSender;
-using OrderService.Api.Utils.ReceiptGenerator;
 using OrderService.Data.Models;
 
 namespace OrderService.Api.RequestHandlers
 {
     public class GenerateReceiptNotificationHandlerEmail : INotificationHandler<SendemailNotification>
     {
-        private readonly IReceiptGenerator _receiptGenerator;
         private readonly IReceiptService _receiptService;
+        private readonly IOrderEventService _orderEventService;
 
-        public GenerateReceiptNotificationHandlerEmail(IReceiptGenerator receiptGenerator, IReceiptService receiptService)
+
+        public GenerateReceiptNotificationHandlerEmail(IReceiptService receiptService, IOrderEventService orderEventService)
         {
-            _receiptGenerator = receiptGenerator;
             _receiptService = receiptService;
+            _orderEventService = orderEventService;
         }
         public async Task Handle(SendemailNotification notification, CancellationToken cancellationToken)
         {
-            var emailbody = await Task.Run(() => _receiptGenerator.GenerateEmailReceipt(notification.Order),default(CancellationToken));
+            var orderFromEventStore =
+                await _orderEventService.GetEventStoreOrder(r => r.MessageId == notification.MessageId,null);
 
-            if (emailbody == null)
+            if (orderFromEventStore == null)
             {
-                Console.WriteLine("No email receipt generated");
+                Console.WriteLine("No order found in event store");
             }
             else
             {
                     await _receiptService.AddReceipt(new Receipt
                     {
                         Id = Guid.NewGuid(),
-                        OrderId = notification.Order.Id,
-                        CompanyName = notification.Order.Company,
-                        ReceiptDetails = emailbody,
+                        OrderId = notification.OrderId,
+                        ReceiptDetails = orderFromEventStore.HtmlReceipt,
+                        CompanyName = notification.CompanyName,
                         ReceiptGenerationTime = DateTime.UtcNow,
-                        ReceiptType = ReceiptType.email
+                        ReceiptType = ReceiptType.Html
+                    });
+
+                    await _receiptService.AddReceipt(new Receipt
+                    {
+                        Id = Guid.NewGuid(),
+                        OrderId = notification.OrderId,
+                        ReceiptDetails = orderFromEventStore.JsonReceipt,
+                        ReceiptGenerationTime = DateTime.UtcNow,
+                        CompanyName = notification.CompanyName,
+                        ReceiptType = ReceiptType.JSon
                     });
             }
         }

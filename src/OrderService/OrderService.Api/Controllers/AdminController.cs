@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using OrderService.Api.Model;
+using MediatR;
+using OrderService.Api.Model.Event;
+using OrderService.Api.Model.Request;
+using OrderService.Api.Model.ViewModel;
 using OrderService.Api.Services;
 using OrderService.Data.Models;
 
@@ -16,14 +20,19 @@ namespace OrderService.Api.Controllers
         private readonly IProductService _productService;
         private readonly IReceiptService _receiptService;
         private readonly IOrderService _orderService;
+        private readonly IProductEventService _productEventService;
+
+        private readonly IMediator _mediator;
 
 
 
-        public AdminController(IProductService productService, IReceiptService receiptService, IOrderService orderService)
+        public AdminController(IProductService productService, IReceiptService receiptService, IOrderService orderService, IMediator mediator, IProductEventService productEventService)
         {
             _productService = productService;
             _receiptService = receiptService;
             _orderService = orderService;
+            _mediator = mediator;
+            _productEventService = productEventService;
         }
 
         [HttpGet]
@@ -44,36 +53,79 @@ namespace OrderService.Api.Controllers
         [Route("getjsonreceipts")]
         public async Task<IActionResult> GetJsonReceipts()
         {
-            return Ok(await _receiptService.GetReceipts(r=>r.ReceiptType==ReceiptType.JSon, null));
+            var receipts = await _receiptService.GetReceipts(r => r.ReceiptType == ReceiptType.JSon, null);
+            var orderids = receipts.Select(r=>r.OrderId).Distinct();
+
+            var orderViewModels=new List<ReceiptViewModel>();
+
+            foreach (var orderid in orderids)
+            {
+                var orderReceipt = receipts.FirstOrDefault(r => r.OrderId == orderid);
+                orderViewModels.Add(new ReceiptViewModel
+                {
+                    CompanyName = orderReceipt.CompanyName,
+                    OrderId = orderReceipt.OrderId,
+                    ReceiptDetails = orderReceipt.ReceiptDetails
+                });
+            }
+           
+
+            return Ok(orderViewModels);
         }
 
         [HttpGet]
         [Route("gethtmlreceipts")]
         public async Task<IActionResult> GetHtmlReceipts()
         {
-            return Ok(await _receiptService.GetReceipts(r => r.ReceiptType == ReceiptType.Html, null));
+            var receipts = await _receiptService.GetReceipts(r => r.ReceiptType == ReceiptType.Html, null);
+            var orderids = receipts.Select(r => r.OrderId).Distinct();
+
+            var orderViewModels = new List<ReceiptViewModel>();
+
+            foreach (var orderid in orderids)
+            {
+                var orderReceipt = receipts.FirstOrDefault(r => r.OrderId == orderid);
+                orderViewModels.Add(new ReceiptViewModel
+                {
+                    CompanyName = orderReceipt.CompanyName,
+                    OrderId = orderReceipt.OrderId,
+                    ReceiptDetails = orderReceipt.ReceiptDetails
+                });
+            }
+
+
+            return Ok(orderViewModels);
         }
 
         [HttpPost]
         [Route("addproduct")]
-        public async Task<IActionResult> AddProduct([FromBody] AddProduct model)
+        public async Task<IActionResult> AddProduct([FromBody] CreateProduct model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest("Please enter valid input");
             }
+            var productCreatedEvent = await _mediator.Send(model);
 
+            if (productCreatedEvent != null)
+            {
+                await _mediator.Send(new ProductCreated
+                {
+                    MessageId = productCreatedEvent.MessageId
+                });
+            }
             var product = new Product
             {
                 Id = Guid.NewGuid(),
-                ProductName = model.ProductName,
-                ProductType = model.ProductType,
-                Price = model.Price,
-                HasDisabilityDiscount = model.HasDisabilityDiscount,
-                HasFlatDiscount = model.HasFlatDiscount,
-                HasQuantityDiscount = model.HasQuantityDiscount
+                HasDisabilityDiscount = productCreatedEvent.HasDisabilityDiscount,
+                HasFlatDiscount = productCreatedEvent.HasFlatDiscount,
+                HasQuantityDiscount = productCreatedEvent.HasQuantityDiscount,
+                Price = productCreatedEvent.Price,
+                ProductName = productCreatedEvent.ProductName,
+                ProductType = productCreatedEvent.ProductType
             };
-            await _productService.AddProduct(product);
+
+
             return Ok(product);
         }
 

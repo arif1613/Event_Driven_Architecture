@@ -8,5 +8,8 @@ namespace OrderService.Data.UnitOfWork
         IRepository<Order> OrderRepository { get; }
         IRepository<Product> ProductRepository { get; }
         IRepository<Receipt> ReceiptRepository { get; }
+        IRepository<OrderCreatedEvent> OrderCreatedEventRepository { get; }
+        IRepository<ProductCreatedEvent> ProductCreatedEventRepository { get; }
+
     }
 }

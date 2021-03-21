@@ -9,8 +9,6 @@ namespace OrderService.Api.Services
     public interface IProductService
     {
         Task AddProduct(Product product);
-        Task AddProducts(List<Product> products);
-
         Task<Product> GetProduct(Expression<Func<Product, bool>> filter, string includeProperties);
         Task<List<Product>> GetProducts(Expression<Func<Product, bool>> filter, string includeProperties);
 

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using MediatR;
-using OrderService.Api.Model;
-using OrderService.Api.Services;
-using OrderService.Data.Models;
+using OrderService.Api.Model.Event;
+using OrderService.Api.Model.Notification;
+using OrderService.Api.Model.Request;
 
 namespace OrderService.Api.Controllers
 {
@@ -25,7 +23,7 @@ namespace OrderService.Api.Controllers
 
         [HttpPost]
         [Route("createorder")]
-        public async Task<IActionResult> AddOrder([FromBody] CreateOrderRequest model)
+        public async Task<IActionResult> AddOrder([FromBody] CreateOrder model)
         {
             if (!ModelState.IsValid)
             {
@@ -35,29 +33,24 @@ namespace OrderService.Api.Controllers
             var order = await _mediator.Send(model);
             if (order==null)
             {
-                return NotFound("Product not found");
+                return NotFound("Product(s) is order not found");
             }
 
-
-            //Notify json generator service
-            await _mediator.Publish(new GenerateJsonReceiptNotification
+            var ordercreatedevent=await _mediator.Send(new OrderCreated
             {
                 MessageId = Guid.NewGuid(),
                 Order = order
             });
 
-            //Notify html generator service
-            await _mediator.Publish(new GenerateHtmlReceiptNotification
-            {
-                MessageId = Guid.NewGuid(),
-                Order = order
-            });
+
+
 
             //Notify email sender service
             await _mediator.Publish(new SendemailNotification
             {
-                MessageId = Guid.NewGuid(),
-                Order = order
+                MessageId = ordercreatedevent.MessageId,
+                OrderId = ordercreatedevent.Id,
+                CompanyName = order.Company
             });
 
             return Ok(order);

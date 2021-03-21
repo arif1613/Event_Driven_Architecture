@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using OrderService.Api.Model;
+using OrderService.Api.Model.Request;
 using OrderService.Api.Utils.OrderActions;
 using OrderService.Data.Models;
 

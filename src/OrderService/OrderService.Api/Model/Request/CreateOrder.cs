@@ -3,12 +3,10 @@ using System.ComponentModel.DataAnnotations;
 using MediatR;
 using OrderService.Data.Models;
 
-namespace OrderService.Api.Model
+namespace OrderService.Api.Model.Request
 {
-    public class CreateOrderRequest : IRequest<Order>
+    public class CreateOrder : IRequest<Order>
     {
-        
-
         [Required]
         public string CompanyName { get; set; }
         [Required]

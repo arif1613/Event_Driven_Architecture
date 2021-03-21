@@ -2,7 +2,6 @@
 using System.IO;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.VisualBasic.FileIO;
 using OrderService.Data.Models;
 
@@ -22,6 +21,8 @@ namespace OrderService.Data.Context
         public DbSet<OrderLine> OrderLines { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Receipt> Receipts { get; set; }
+        public DbSet<OrderCreatedEvent> MessageCreatedEvents { get; set; }
+        public DbSet<ProductCreatedEvent> ProductCreatedEvents { get; set; }
 
         public void SaveDatabase()
         {
@@ -31,6 +32,11 @@ namespace OrderService.Data.Context
         public DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class
         {
             return Set<TEntity>();
+        }
+
+        public EntityState GetEntityState<TEntity>(TEntity entity) where TEntity : class
+        {
+            return Entry(entity).State;
         }
 
         public void UpdateEntry<TEntity>(TEntity entity) where TEntity : class

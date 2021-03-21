@@ -21,13 +21,6 @@ namespace OrderService.Api.Services
         {
             await Task.Run(() => _unitOfWork.ProductRepository.Insert(product));
         }
-
-        public async Task AddProducts(List<Product> products)
-        {
-            await Task.Run(() => _unitOfWork.ProductRepository.Insert(products));
-
-        }
-
         public async Task<Product> GetProduct(Expression<Func<Product, bool>> filter, string includeProperties)
         {
             var products= await Task.Run(() => _unitOfWork.ProductRepository.Get(filter, includeProperties));

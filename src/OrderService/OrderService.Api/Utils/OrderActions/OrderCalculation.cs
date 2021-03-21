@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.Extensions.Configuration;
-using OrderService.Api.Model;
+using OrderService.Api.Model.Request;
 using OrderService.Data.Models;
 
 namespace OrderService.Api.Utils.OrderActions
@@ -58,7 +55,7 @@ namespace OrderService.Api.Utils.OrderActions
             return orderline;
         }
 
-        public Order CreateOrder(CreateOrderRequest request, List<OrderLine> orderlines)
+        public Order CreateOrder(CreateOrder request, List<OrderLine> orderlines)
         {
             int totalPrice = 0;
             foreach (var orderline in orderlines)

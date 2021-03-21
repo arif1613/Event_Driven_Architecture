@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using OrderService.Data.Context;
 
 namespace OrderService.Data.Repo
@@ -37,6 +35,10 @@ namespace OrderService.Data.Repo
         {
             try
             {
+                if (context.GetEntityState(entity) != EntityState.Detached)
+                {
+                    context.GetDbSet<TEntity>().Attach(entity);
+                }
                 context.GetDbSet<TEntity>().Add(entity);
             }
             catch (Exception e)
@@ -52,6 +54,10 @@ namespace OrderService.Data.Repo
 
             try
             {
+                if (context.GetEntityState(entities) == EntityState.Detached)
+                {
+                    context.GetDbSet<TEntity>().AttachRange(entities);
+                }
                 context.GetDbSet<TEntity>().AddRange(entities);
             }
             catch (Exception e)

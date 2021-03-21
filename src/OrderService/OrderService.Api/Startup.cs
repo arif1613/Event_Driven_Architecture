@@ -3,10 +3,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Collections.Generic;
 using MediatR;
 using Microsoft.OpenApi.Models;
-using OrderService.Api.Model;
+using OrderService.Api.Model.Event;
+using OrderService.Api.Model.Notification;
+using OrderService.Api.Model.Request;
 using OrderService.Api.Services;
 using OrderService.Api.Utils.EmailSender;
 using OrderService.Api.Utils.OrderActions;
@@ -49,7 +50,9 @@ namespace OrderService.Api
 
             //register services
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IProductEventService, ProductEventService>();
             services.AddScoped<IOrderService, Services.OrderService>();
+            services.AddScoped<IOrderEventService, OrderEventService>();
             services.AddScoped<IReceiptService, ReceiptService>();
             services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IReceiptGenerator, ReceiptGenerator>();
@@ -65,16 +68,16 @@ namespace OrderService.Api
 
         private static IMediator BuildMediator(IServiceCollection services)
         {
+            //Event
+            services.AddMediatR(typeof(ProductCreated));
+            services.AddMediatR(typeof(OrderCreated));
             //Request
-            services.AddMediatR(typeof(CreateOrderRequest));
+            services.AddMediatR(typeof(CreateProduct));
+            services.AddMediatR(typeof(CreateOrder));
             //Notification
-            services.AddMediatR(typeof(GenerateJsonReceiptNotification));
-            services.AddMediatR(typeof(GenerateHtmlReceiptNotification));
             services.AddMediatR(typeof(SendemailNotification));
-            
             var provider = services.BuildServiceProvider();
             return provider.GetRequiredService<IMediator>();
-
         }
 
 

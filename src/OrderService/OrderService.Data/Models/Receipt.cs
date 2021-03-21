@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OrderService.Data.Models
 {
@@ -16,7 +14,6 @@ namespace OrderService.Data.Models
     public enum ReceiptType
     {
         JSon=0,
-        Html=1,
-        email=2
+        Html=1
     }
 }
