@@ -6,7 +6,5 @@ namespace OrderService.Api.Utils.ReceiptGenerator
     {
         string GenerateJsonReceipt(Order order);
         string GenerateHtmlReceipt(Order order);
-        string GenerateEmailReceipt(Order order);
-
     }
 }

@@ -9,7 +9,7 @@ using OrderService.Api.Model.Request;
 namespace OrderService.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class OrderController : ControllerBase
     {
         private readonly IMediator _mediator;

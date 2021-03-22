@@ -9,7 +9,6 @@ using OrderService.Api.Model.Event;
 using OrderService.Api.Model.Notification;
 using OrderService.Api.Model.Request;
 using OrderService.Api.Services;
-using OrderService.Api.Utils.EmailSender;
 using OrderService.Api.Utils.OrderActions;
 using OrderService.Api.Utils.ReceiptGenerator;
 using OrderService.Data.Context;
@@ -54,7 +53,6 @@ namespace OrderService.Api
             services.AddScoped<IOrderService, Services.OrderService>();
             services.AddScoped<IOrderEventService, OrderEventService>();
             services.AddScoped<IReceiptService, ReceiptService>();
-            services.AddScoped<IEmailSender, EmailSender>();
             services.AddScoped<IReceiptGenerator, ReceiptGenerator>();
             services.AddScoped<IOrderCalculation,OrderCalculation>();
 

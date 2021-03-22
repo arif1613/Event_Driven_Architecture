@@ -13,26 +13,20 @@ using OrderService.Data.Models;
 namespace OrderService.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     //[Authorize]
     public class AdminController : ControllerBase
     {
         private readonly IProductService _productService;
         private readonly IReceiptService _receiptService;
         private readonly IOrderService _orderService;
-        private readonly IProductEventService _productEventService;
-
         private readonly IMediator _mediator;
-
-
-
-        public AdminController(IProductService productService, IReceiptService receiptService, IOrderService orderService, IMediator mediator, IProductEventService productEventService)
+        public AdminController(IProductService productService, IReceiptService receiptService, IOrderService orderService, IMediator mediator)
         {
             _productService = productService;
             _receiptService = receiptService;
             _orderService = orderService;
             _mediator = mediator;
-            _productEventService = productEventService;
         }
 
         [HttpGet]
@@ -106,7 +100,10 @@ namespace OrderService.Api.Controllers
                 return BadRequest("Please enter valid input");
             }
             var productCreatedEvent = await _mediator.Send(model);
-
+            if (productCreatedEvent == null)
+            {
+                return NotFound();
+            }
             if (productCreatedEvent != null)
             {
                 await _mediator.Send(new ProductCreated
